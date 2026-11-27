@@ -182,7 +182,7 @@
     }
 
     .instructions-title {
-      margin: 0 0 5px;
+      margin: 0 0 6px;
       font-weight: 600;
     }
 
@@ -195,16 +195,25 @@
     .store-chip {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 3px 9px;
+      gap: 5px;
+      padding: 4px 10px;
       border: 1px solid #bfe2d2;
       border-radius: 999px;
       background: #eaf7f2;
       color: var(--brand-dark);
-      font-size: 10.5px;
+      font-size: 11.5px;
       font-weight: 800;
+      line-height: 1.2;
       text-decoration: none;
       transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+    }
+
+    .store-icon {
+      display: block;
+      width: 12px;
+      height: 12px;
+      flex: 0 0 12px;
+      object-fit: contain;
     }
 
     .store-chip:hover {
@@ -717,8 +726,14 @@
           Bukti kehadiran menggunakan foto <b>wajib</b> menggunakan aplikasi <b>TimeMark</b>:
         </div>
         <div class="store-links">
-          <a class="store-chip" href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new" target="_blank" rel="noopener noreferrer">📱 Android (Play Store)</a>
-          <a class="store-chip" href="https://apps.apple.com/app/apple-store/id6446071834?pt=126093046&ct=official_website&mt=8" target="_blank" rel="noopener noreferrer">🍎 iOS (App Store)</a>
+          <a class="store-chip" href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new" target="_blank" rel="noopener noreferrer">
+            <img src="./play-store.png" alt="" class="store-icon" aria-hidden="true">
+            <span>Android (Play Store)</span>
+          </a>
+          <a class="store-chip" href="https://apps.apple.com/app/apple-store/id6446071834?pt=126093046&ct=official_website&mt=8" target="_blank" rel="noopener noreferrer">
+            <img src="./apps-store.png" alt="" class="store-icon" aria-hidden="true">
+            <span>iOS (App Store)</span>
+          </a>
         </div>
       </div>
     </section>
