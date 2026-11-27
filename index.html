@@ -116,13 +116,41 @@
 
     h2 {
       max-width: 590px;
-      margin: 0 auto 12px;
+      margin: 0 auto 8px;
       color: var(--ink);
-      font-size: clamp(19px, 3vw, 25px);
+      font-size: clamp(19px, 3vw, 24px);
       font-weight: 800;
       line-height: 1.28;
       letter-spacing: -0.035em;
       text-align: center;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 0 auto 14px;
+    }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 9px;
+      border: 1px solid #d3ecdf;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .meta-pill.is-open {
+      border-color: #dbe4ea;
+      background: #f4f7f9;
+      color: #475569;
     }
 
     .date {
@@ -472,6 +500,10 @@
         font-size: 16px;
       }
 
+      .meta-pill {
+        font-size: 10px;
+      }
+
       .date {
         font-size: 12px;
       }
@@ -554,7 +586,10 @@
     <div class="accent"></div>
     <img src="https://lh3.googleusercontent.com/d/1cl2HKmc_y_TYIvlQ81qh_ZVoelZD-eQ_" alt="Banner HKN 2026" class="banner">
     <div id="currentDate" class="date">Memuat tanggal...</div>
-    <h2>Daftar Hadir<br>Hari Kesehatan Nasional ke-62 Tahun 2026</h2>
+    <h2 id="eventTitle">Daftar Hadir<br>Memuat Kegiatan...</h2>
+    <div id="eventMeta" class="event-meta">
+      <span class="meta-pill">Memuat detail lokasi...</span>
+    </div>
     <div class="instructions">
       Bukti kehadiran menggunakan foto <b>wajib</b> menggunakan Aplikasi TimeMark. Unduh aplikasi melalui:<br>
 - Android: <a href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new" target="_blank" rel="noopener noreferrer">Play Store</a><br>
@@ -621,10 +656,48 @@
         initMap();
       } catch (error) {
         document.getElementById("versionDisplay").textContent = "GeoAttend-HKN62 • v2.0.0";
+        document.getElementById("eventTitle").textContent = "Daftar Hadir";
+        document.getElementById("eventMeta").innerHTML = "";
         showPopup(false, "Gagal Memuat Konfigurasi",
           "Tidak dapat membaca konfigurasi dari server: " + error.message);
       }
     });
+
+    function renderEventHeader(config) {
+      const titleEl = document.getElementById("eventTitle");
+      const metaEl = document.getElementById("eventMeta");
+
+      titleEl.innerHTML = "";
+      titleEl.appendChild(document.createTextNode("Daftar Hadir"));
+      if (config.eventName) {
+        titleEl.appendChild(document.createElement("br"));
+        titleEl.appendChild(document.createTextNode(config.eventName));
+        document.title = "GeoAttend • " + config.eventName;
+      }
+
+      metaEl.innerHTML = "";
+      const isStrict = config.restrict === "YES";
+      const restrictLabel = isStrict ? "Strict Geofence" : "Open Location";
+
+      const pills = [];
+      if (config.locationName) {
+        pills.push({ text: "📍 " + config.locationName, open: false });
+      }
+      if (Number.isFinite(config.allowedRadius) && config.allowedRadius > 0) {
+        pills.push({ text: "🎯 Radius " + Math.round(config.allowedRadius) + " m", open: false });
+      }
+      pills.push({
+        text: (isStrict ? "🔒 " : "🌐 ") + restrictLabel,
+        open: !isStrict
+      });
+
+      pills.forEach(item => {
+        const span = document.createElement("span");
+        span.className = "meta-pill" + (item.open ? " is-open" : "");
+        span.textContent = item.text;
+        metaEl.appendChild(span);
+      });
+    }
 
     async function loadAttendanceConfig() {
       if (!GAS_WEB_APP_URL || !GAS_WEB_APP_URL.startsWith("https://")) {
@@ -655,11 +728,23 @@
         document.getElementById("versionDisplay").textContent = "GeoAttend-HKN62 • v2.0.0";
       }
 
+      const rawAllowedRadius = Number(config.allowedRadius ?? config.AllowedRadius);
+      const rawRadiusKm = Number(config.radiusKm);
+      const resolvedRadiusKm = Number.isFinite(rawRadiusKm) && rawRadiusKm > 0
+        ? rawRadiusKm
+        : (Number.isFinite(rawAllowedRadius) && rawAllowedRadius > 0 ? rawAllowedRadius / 1000 : NaN);
+      const resolvedAllowedRadius = Number.isFinite(rawAllowedRadius) && rawAllowedRadius > 0
+        ? rawAllowedRadius
+        : (Number.isFinite(resolvedRadiusKm) ? Math.round(resolvedRadiusKm * 1000) : NaN);
+
       const normalized = {
-        targetLat: Number(config.targetLat),
-        targetLng: Number(config.targetLng),
-        radiusKm: Number(config.radiusKm),
-        restrict: String(config.restrict || "").trim().toUpperCase()
+        eventName: String(config.eventName ?? config.EventName ?? "").trim(),
+        locationName: String(config.locationName ?? config.LocationName ?? "").trim(),
+        targetLat: Number(config.targetLat ?? config.Latitude),
+        targetLng: Number(config.targetLng ?? config.Longitude),
+        allowedRadius: resolvedAllowedRadius,
+        radiusKm: resolvedRadiusKm,
+        restrict: String(config.restrict ?? config.Restrict ?? "").trim().toUpperCase()
       };
 
       if (!Number.isFinite(normalized.targetLat) ||
@@ -671,6 +756,7 @@
       }
 
       attendanceConfig = normalized;
+      renderEventHeader(attendanceConfig);
       console.log("Live attendance config:", attendanceConfig);
       return attendanceConfig;
     }
@@ -740,7 +826,8 @@
             fillOpacity:.15, radius:attendanceConfig.radiusKm*1000
           }).addTo(map);
         }
-        fenceCircle.bindPopup("Zona absensi (" +
+        const zoneTitle = attendanceConfig.locationName || "Zona absensi";
+        fenceCircle.bindPopup(zoneTitle + " (" +
           Math.round(attendanceConfig.radiusKm*1000) + " meter)");
       } else if (fenceCircle) {
         map.removeLayer(fenceCircle);
