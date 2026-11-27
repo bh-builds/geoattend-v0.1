@@ -28,7 +28,7 @@
       --danger: #b42318;
       --radius-sm: 9px;
       --radius-md: 14px;
-      --radius-lg: 18px;
+      --radius-lg: 12px;
       --shadow-card: 0 14px 38px rgba(17, 83, 54, 0.09);
       --shadow-control: 0 4px 12px rgba(17, 83, 54, 0.10);
       --font: "Plus Jakarta Sans", Arial, sans-serif;
@@ -55,7 +55,7 @@
       justify-content: center;
       align-items: flex-start;
       margin: 0;
-      padding: 20px 14px;
+      padding: 14px;
       background:
         radial-gradient(circle at 8% 0%, rgba(22, 134, 83, 0.10), transparent 28rem),
         radial-gradient(circle at 100% 20%, rgba(0, 150, 136, 0.08), transparent 24rem),
@@ -72,7 +72,7 @@
       overflow: hidden;
       padding: 18px 16px 16px;
       border: 1px solid rgba(216, 231, 223, 0.95);
-      border-radius: var(--radius-lg);
+      border-radius: 12px;
       background: var(--surface);
       box-shadow: var(--shadow-card);
     }
@@ -598,17 +598,17 @@
     @media (max-width: 640px) {
       body {
         display: block;
-        padding: 0;
+        padding: 14px;
         background: var(--page);
       }
 
       .card {
         width: 100%;
-        min-height: 100vh;
+        min-height: calc(100vh - 28px);
         padding: 16px 14px 20px;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
+        border: 1px solid rgba(216, 231, 223, 0.95);
+        border-radius: 12px;
+        box-shadow: var(--shadow-card);
       }
 
       .accent {
