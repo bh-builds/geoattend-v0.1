@@ -15,6 +15,7 @@
        ========================================================= */
     :root {
       --brand: #168653;
+      --brand-teal: #009688;
       --brand-dark: #0f6540;
       --brand-deep: #0b4d32;
       --brand-soft: #eaf7f0;
@@ -57,7 +58,7 @@
       padding: 20px 14px;
       background:
         radial-gradient(circle at 8% 0%, rgba(22, 134, 83, 0.10), transparent 28rem),
-        radial-gradient(circle at 100% 20%, rgba(62, 169, 119, 0.07), transparent 24rem),
+        radial-gradient(circle at 100% 20%, rgba(0, 150, 136, 0.08), transparent 24rem),
         var(--page);
       color: var(--ink);
       font-family: var(--font);
@@ -80,11 +81,11 @@
       position: absolute;
       inset: 0 0 auto;
       height: 5px;
-      background: linear-gradient(90deg, #0f6540 0%, #1c9b63 55%, #72c99b 100%);
+      background: linear-gradient(90deg, #0f6540 0%, #168653 50%, #009688 100%);
     }
 
     /* =========================================================
-3. Header, banner, date, and instructions
+3. Banner & unified event hero card
        ========================================================= */
     .banner {
       display: block;
@@ -95,33 +96,41 @@
       object-fit: contain;
     }
 
-    .header {
+    .event-card {
+      margin: 0 0 16px;
+      padding: 14px 14px 13px;
+      border: 1px solid #cce7db;
+      border-radius: var(--radius-md);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(0, 150, 136, 0.08), transparent 14rem),
+        linear-gradient(160deg, #effaf4 0%, #f7fcfa 60%, #eef8f6 100%);
+      box-shadow: 0 4px 14px rgba(15, 101, 64, 0.05);
       text-align: center;
     }
 
-    .tag {
+    .date-badge {
       display: inline-flex;
       align-items: center;
-      margin-bottom: 8px;
-      padding: 4px 10px;
-      border: 1px solid #d3ecdf;
+      justify-content: center;
+      gap: 5px;
+      margin: 0 auto 10px;
+      padding: 4px 11px;
+      border: 1px solid #c6e6d7;
       border-radius: 999px;
-      background: var(--brand-soft);
+      background: #ffffff;
       color: var(--brand-dark);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(15, 101, 64, 0.05);
     }
 
-    h2 {
-      max-width: 590px;
-      margin: 0 auto 8px;
+    .event-card h2 {
+      margin: 0 auto 9px;
       color: var(--ink);
-      font-size: clamp(19px, 3vw, 24px);
+      font-size: clamp(18px, 3vw, 22px);
       font-weight: 800;
       line-height: 1.28;
-      letter-spacing: -0.035em;
+      letter-spacing: -0.03em;
       text-align: center;
     }
 
@@ -129,64 +138,79 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 6px;
-      margin: 0 auto 14px;
+      gap: 5px;
+      margin: 0 auto 12px;
     }
 
     .meta-pill {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 9px;
-      border: 1px solid #d3ecdf;
+      padding: 3.5px 9px;
+      border: 1px solid #cde7db;
       border-radius: 999px;
-      background: var(--brand-soft);
+      background: rgba(255, 255, 255, 0.85);
       color: var(--brand-dark);
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       line-height: 1.3;
     }
 
     .meta-pill.is-open {
       border-color: #dbe4ea;
-      background: #f4f7f9;
+      background: #f8fafc;
       color: #475569;
     }
 
-    .date {
-      max-width: 540px;
-      margin: 0 auto 12px;
-      padding: 8px 12px;
-      border: 1px solid #cde8d9;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #effaf3, #f8fcf9);
-      color: var(--brand-dark);
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
+    .event-divider {
+      height: 1px;
+      margin: 0 0 11px;
+      border: 0;
+      background: linear-gradient(90deg, transparent, #c7e5d6, transparent);
     }
 
     .instructions {
-      margin: 0 0 16px;
-      padding: 11px 13px;
-      border: 1px solid #dceee3;
-      border-left: 4px solid var(--brand);
+      margin: 0;
+      padding: 9px 11px;
       border-radius: 10px;
-      background: var(--brand-pale);
-      color: #355344;
-      font-size: 11px;
-      line-height: 1.6;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(204, 231, 219, 0.85);
+      color: #314e41;
+      font-size: 10.8px;
+      line-height: 1.55;
+      text-align: left;
     }
 
-    .instructions a {
+    .instructions-title {
+      margin: 0 0 5px;
+      font-weight: 600;
+    }
+
+    .store-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .store-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border: 1px solid #bfe2d2;
+      border-radius: 999px;
+      background: #eaf7f2;
       color: var(--brand-dark);
+      font-size: 10.5px;
       font-weight: 800;
       text-decoration: none;
+      transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
     }
 
-    .instructions a:hover {
-      text-decoration: underline;
-      text-underline-offset: 3px;
+    .store-chip:hover {
+      background: #dcf2e9;
+      border-color: #93ceb5;
+      transform: translateY(-1px);
     }
 
     /* =========================================================
@@ -215,8 +239,7 @@
     }
 
     input[type="text"],
-    input[type="tel"],
-    input[type="file"] {
+    input[type="tel"] {
       display: block;
       width: 100%;
       min-width: 0;
@@ -238,16 +261,105 @@
       font-weight: 400;
     }
 
-    input[type="file"] {
-      padding: 6px 9px;
-      background: #fbfdfc;
-      font-size: 10.5px;
-      cursor: pointer;
-    }
-
     input:focus-visible {
       border-color: var(--brand);
       box-shadow: 0 0 0 3px rgba(22, 134, 83, 0.12);
+    }
+
+    /* Visually hidden native file input */
+    .sr-only-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Custom Kemenkes green-teal upload button (adapted from Uiverse.io by SpatexDEV) */
+    .upload-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .upload-btn {
+      border: none;
+      display: flex;
+      width: 100%;
+      min-height: 44px;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #168653 0%, #009688 100%);
+      color: #ffffff;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      line-height: 1rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.65rem;
+      user-select: none;
+      gap: 0.75rem;
+      box-shadow:
+        0 4px 10px -1px rgba(22, 134, 83, 0.28),
+        0 2px 4px -1px rgba(0, 150, 136, 0.16);
+      transition: all 0.35s ease;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #137649 0%, #008578 100%);
+      box-shadow:
+        0 10px 18px -3px rgba(22, 134, 83, 0.35),
+        0 4px 6px -2px rgba(0, 150, 136, 0.20);
+    }
+
+    .upload-btn:focus-visible {
+      outline: 3px solid rgba(0, 150, 136, 0.28);
+      outline-offset: 2px;
+    }
+
+    .upload-btn:active {
+      opacity: 0.88;
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .upload-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .file-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px dashed #c8e3d6;
+      border-radius: 8px;
+      background: #f7fcf9;
+      color: #5b7268;
+      font-size: 10.5px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-status.has-file {
+      border-style: solid;
+      border-color: #9ed4bc;
+      background: #eaf7f1;
+      color: var(--brand-dark);
     }
 
     /* =========================================================
@@ -336,7 +448,7 @@
       margin-top: 2px;
     }
 
-    button {
+    .buttons button {
       display: flex;
       width: 100%;
       min-height: 42px;
@@ -353,13 +465,13 @@
       transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
     }
 
-    button:hover:not(:disabled) {
+    .buttons button:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: var(--shadow-control);
       filter: saturate(1.06);
     }
 
-    button:focus-visible,
+    .buttons button:focus-visible,
     .refresh-btn:focus-visible {
       outline: 3px solid rgba(22, 134, 83, 0.24);
       outline-offset: 2px;
@@ -370,10 +482,10 @@
     }
 
     .checkout {
-      background: linear-gradient(135deg, #125f42, #168653);
+      background: linear-gradient(135deg, #0f6540, #00897b);
     }
 
-    button:disabled {
+    .buttons button:disabled {
       background: #aab7b0 !important;
       box-shadow: none;
       cursor: not-allowed;
@@ -461,7 +573,19 @@
     }
 
     .modal-btn {
+      display: flex;
+      width: 100%;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 10px;
       background: var(--brand);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .modal-btn.error-btn {
@@ -496,20 +620,19 @@
         border-radius: 11px;
       }
 
-      h2 {
-        font-size: 16px;
+      .event-card {
+        padding: 12px 11px;
+      }
+
+      .event-card h2 {
+        font-size: 16.5px;
       }
 
       .meta-pill {
-        font-size: 10px;
-      }
-
-      .date {
-        font-size: 12px;
+        font-size: 9.8px;
       }
 
       .instructions {
-        padding: 10px 12px;
         font-size: 10.5px;
       }
 
@@ -529,10 +652,6 @@
       input[type="tel"] {
         min-height: 42px;
         font-size: 14px;
-      }
-
-      input[type="file"] {
-        min-height: 40px;
       }
 
       #map {
@@ -585,23 +704,65 @@
   <main class="card">
     <div class="accent"></div>
     <img src="https://lh3.googleusercontent.com/d/1cl2HKmc_y_TYIvlQ81qh_ZVoelZD-eQ_" alt="Banner HKN 2026" class="banner">
-    <div id="currentDate" class="date">Memuat tanggal...</div>
-    <h2 id="eventTitle">Daftar Hadir<br>Memuat Kegiatan...</h2>
-    <div id="eventMeta" class="event-meta">
-      <span class="meta-pill">Memuat detail lokasi...</span>
-    </div>
-    <div class="instructions">
-      Bukti kehadiran menggunakan foto <b>wajib</b> menggunakan Aplikasi TimeMark. Unduh aplikasi melalui:<br>
-- Android: <a href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new" target="_blank" rel="noopener noreferrer">Play Store</a><br>
-- iOS: <a href="https://apps.apple.com/app/apple-store/id6446071834?pt=126093046&ct=official_website&mt=8" target="_blank" rel="noopener noreferrer">App Store</a>
-    </div>
+
+    <section class="event-card" aria-label="Informasi Kegiatan">
+      <div id="currentDate" class="date-badge">Memuat tanggal...</div>
+      <h2 id="eventTitle">Daftar Hadir<br>Memuat Kegiatan...</h2>
+      <div id="eventMeta" class="event-meta">
+        <span class="meta-pill">Memuat detail lokasi...</span>
+      </div>
+      <hr class="event-divider">
+      <div class="instructions">
+        <div class="instructions-title">
+          Bukti kehadiran menggunakan foto <b>wajib</b> menggunakan aplikasi <b>TimeMark</b>:
+        </div>
+        <div class="store-links">
+          <a class="store-chip" href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new" target="_blank" rel="noopener noreferrer">📱 Android (Play Store)</a>
+          <a class="store-chip" href="https://apps.apple.com/app/apple-store/id6446071834?pt=126093046&ct=official_website&mt=8" target="_blank" rel="noopener noreferrer">🍎 iOS (App Store)</a>
+        </div>
+      </div>
+    </section>
 
     <form id="geoForm" novalidate>
       <div class="group full"><label for="nama">Nama *</label><input type="text" id="nama" placeholder="Masukkan nama lengkap" autocomplete="name" required></div>
       <div class="group"><label for="nip">NIP *</label><input type="text" id="nip" placeholder="Masukkan Nomor Induk Pegawai" inputmode="numeric" required></div>
       <div class="group"><label for="timKerja">Tim Kerja / Direktorat *</label><input type="text" id="timKerja" placeholder="Contoh: Tim Kerja ... / Direktorat ..." required></div>
       <div class="group full"><label for="noTelp">No Telepon / WhatsApp *</label><input type="tel" id="noTelp" placeholder="Contoh: 081234567890" autocomplete="tel" required></div>
-      <div class="group full"><label for="fotoKedatangan">Upload Foto Selfie (Wajib TimeMark) *</label><input type="file" id="fotoKedatangan" accept="image/*" required></div>
+
+      <div class="group full">
+        <label for="fotoKedatangan">Upload Foto Selfie (Wajib TimeMark) *</label>
+        <div class="upload-wrapper">
+          <input type="file" id="fotoKedatangan" class="sr-only-input" accept="image/*" required>
+          <button type="button" id="uploadTriggerBtn" class="upload-btn" onclick="document.getElementById('fotoKedatangan').click()">
+            <svg
+              aria-hidden="true"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-width="2"
+                stroke="#ffffff"
+                d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              ></path>
+              <path
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                stroke-width="2"
+                stroke="#ffffff"
+                d="M17 15V18M17 21V18M17 18H14M17 18H20"
+              ></path>
+            </svg>
+            <span id="uploadBtnText">Upload Foto Selfie</span>
+          </button>
+          <div id="fileNameDisplay" class="file-status">Belum ada file dipilih (Maks. 15 MB)</div>
+        </div>
+      </div>
+
       <div class="map-head">
         <label>Lokasi Anda : </label>
         <button type="button" id="refreshGpsBtn" class="refresh-btn" onclick="refreshGPS()" aria-label="Refresh GPS">
@@ -651,6 +812,9 @@
           weekday:"long", year:"numeric", month:"long", day:"numeric"
         });
 
+      const fileInput = document.getElementById("fotoKedatangan");
+      fileInput.addEventListener("change", updateFilePreview);
+
       try {
         await loadAttendanceConfig();
         initMap();
@@ -662,6 +826,24 @@
           "Tidak dapat membaca konfigurasi dari server: " + error.message);
       }
     });
+
+    function updateFilePreview() {
+      const fileInput = document.getElementById("fotoKedatangan");
+      const statusEl = document.getElementById("fileNameDisplay");
+      const btnTextEl = document.getElementById("uploadBtnText");
+      const file = fileInput.files && fileInput.files[0];
+
+      if (file) {
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        statusEl.textContent = "✓ " + file.name + " (" + sizeMb + " MB)";
+        statusEl.classList.add("has-file");
+        btnTextEl.textContent = "Ganti Foto Selfie";
+      } else {
+        statusEl.textContent = "Belum ada file dipilih (Maks. 15 MB)";
+        statusEl.classList.remove("has-file");
+        btnTextEl.textContent = "Upload Foto Selfie";
+      }
+    }
 
     function renderEventHeader(config) {
       const titleEl = document.getElementById("eventTitle");
@@ -783,6 +965,7 @@
       document.getElementById("popupModal").style.display = "none";
       if (wasSuccessful) {
         document.getElementById("geoForm").reset();
+        updateFilePreview();
         wasSuccessful = false;
         refreshGPS();
         window.scrollTo({top:0, behavior:"smooth"});
