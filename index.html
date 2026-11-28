@@ -865,7 +865,7 @@
         </div>
       </div>
       <div class="group"><label for="timKerja">Tim Kerja / Direktorat *</label><input type="text" id="timKerja" placeholder="Contoh: Tim Kerja ... / Direktorat ..." required></div>
-      <div class="group full"><label for="noTelp">No Telepon / WhatsApp *</label><input type="tel" id="noTelp" placeholder="Contoh: 081234567890" autocomplete="tel" required></div>
+      <div class="group full"><label for="noTelp">No Telepon / WhatsApp *</label><input type="text" id="noTelp" inputmode="tel" pattern="[0-9+\s()-]*" placeholder="Contoh: 081234567890" autocomplete="tel" required></div>
 
       <div class="group full">
         <label for="fotoKedatangan">Upload Foto Selfie (Wajib TimeMark) *</label>
@@ -973,12 +973,23 @@
     /* =========================================================
        Searchable Autocomplete Directory (Nama, NIP, No Telp)
        ========================================================= */
+    function formatPhoneAsText(rawPhone) {
+      if (rawPhone == null) return "";
+      let phone = String(rawPhone).replace(/^'+/, "").trim();
+      if (!phone) return "";
+      // Pulihkan nol di depan jika spreadsheet menyimpan nomor Indonesia (8xxxxxxxxxx) sebagai angka
+      if (/^8\d{7,13}$/.test(phone)) {
+        phone = "0" + phone;
+      }
+      return phone;
+    }
+
     function normalizePersonRecord(raw) {
       if (!raw || typeof raw !== "object") return null;
       const nama = String(raw.nama ?? raw.Nama ?? raw.name ?? raw.Name ?? raw.fullName ?? "").trim();
       const nip = String(raw.nip ?? raw.NIP ?? raw.Nip ?? raw.nik ?? raw.NIK ?? "").replace(/^'+/, "").trim();
       const timKerja = String(raw.timKerja ?? raw.TimKerja ?? raw["Tim Kerja"] ?? raw["Tim Kerja / Direktorat"] ?? raw.direktorat ?? raw.unit ?? "").trim();
-      const noTelp = String(raw.noTelp ?? raw.NoTelp ?? raw["No Telepon"] ?? raw["No Telepon / WhatsApp"] ?? raw.telp ?? raw.phone ?? raw.wa ?? "").replace(/^'+/, "").trim();
+      const noTelp = formatPhoneAsText(raw.noTelp ?? raw.NoTelp ?? raw["No Telepon"] ?? raw["No Telepon / WhatsApp"] ?? raw.telp ?? raw.phone ?? raw.wa ?? "");
       if (!nama && !nip) return null;
       return { nama, nip, timKerja, noTelp };
     }
@@ -1001,7 +1012,7 @@
           nama: item.nama || existing.nama || "",
           nip: item.nip || existing.nip || "",
           timKerja: item.timKerja || existing.timKerja || "",
-          noTelp: item.noTelp || existing.noTelp || ""
+          noTelp: formatPhoneAsText(item.noTelp || existing.noTelp || "")
         });
       });
 
@@ -1064,16 +1075,16 @@
 
     function applyAutocompleteSelection(person) {
       const fields = [
-        { id: "nama", val: person.nama },
-        { id: "nip", val: person.nip },
-        { id: "timKerja", val: person.timKerja },
-        { id: "noTelp", val: person.noTelp }
+        { id: "nama", val: String(person.nama || "") },
+        { id: "nip", val: String(person.nip || "") },
+        { id: "timKerja", val: String(person.timKerja || "") },
+        { id: "noTelp", val: formatPhoneAsText(person.noTelp) }
       ];
 
       fields.forEach(f => {
         if (!f.val) return;
         const el = document.getElementById(f.id);
-        el.value = f.val;
+        el.value = String(f.val);
         el.classList.remove("ac-filled-flash");
         void el.offsetWidth;
         el.classList.add("ac-filled-flash");
@@ -1135,7 +1146,7 @@
 
           const metaParts = [];
           if (person.nip) metaParts.push("NIP: " + highlightMatch(person.nip, rawQuery));
-          if (person.noTelp) metaParts.push("Telp: " + escapeHtml(person.noTelp));
+          if (person.noTelp) metaParts.push("Telp: " + escapeHtml(formatPhoneAsText(person.noTelp)));
           if (person.timKerja) metaParts.push(highlightMatch(person.timKerja, rawQuery));
 
           li.innerHTML =
@@ -1461,10 +1472,10 @@
       if (isSubmitting) return;
 
       const status = document.getElementById("status");
-      const nama = document.getElementById("nama").value.trim();
-      const nip = document.getElementById("nip").value.trim();
-      const timKerja = document.getElementById("timKerja").value.trim();
-      const noTelp = document.getElementById("noTelp").value.trim();
+      const nama = String(document.getElementById("nama").value || "").trim();
+      const nip = String(document.getElementById("nip").value || "").trim();
+      const timKerja = String(document.getElementById("timKerja").value || "").trim();
+      const noTelp = formatPhoneAsText(document.getElementById("noTelp").value);
       const file = document.getElementById("fotoKedatangan").files[0];
 
       if (!nama || !nip || !timKerja || !noTelp || !file) {
@@ -1523,7 +1534,11 @@
         status.textContent = "⏫ Mengirim data ke server...";
 
         const formData = {
-          actionType, nama, nip, timKerja, noTelp,
+          actionType,
+          nama: String(nama),
+          nip: String(nip),
+          timKerja: String(timKerja),
+          noTelp: String(noTelp),
           kedatanganData:photo.data,
           kedatanganName:photo.name,
           kedatanganMime:photo.mime,
