@@ -276,6 +276,107 @@
       box-shadow: 0 0 0 3px rgba(22, 134, 83, 0.12);
     }
 
+    /* =========================================================
+4b. Searchable Autocomplete Dropdown (Nama & NIP)
+       ========================================================= */
+    .ac-wrap {
+      position: relative;
+    }
+
+    .ac-wrap input {
+      padding-right: 30px;
+    }
+
+    .ac-search-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #8ba398;
+      pointer-events: none;
+    }
+
+    .ac-list {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 50;
+      display: none;
+      max-height: 210px;
+      overflow-y: auto;
+      margin: 0;
+      padding: 4px;
+      list-style: none;
+      border: 1px solid #bfe2d2;
+      border-radius: 11px;
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(15, 101, 64, 0.15);
+    }
+
+    .ac-list.is-open {
+      display: block;
+    }
+
+    .ac-item {
+      padding: 7px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 120ms ease;
+    }
+
+    .ac-item + .ac-item {
+      margin-top: 2px;
+    }
+
+    .ac-item:hover,
+    .ac-item.is-active {
+      background: #eaf7f1;
+    }
+
+    .ac-name {
+      color: var(--ink);
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .ac-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .ac-mark {
+      padding: 0 2px;
+      border-radius: 3px;
+      background: #d2f1e2;
+      color: var(--brand-deep);
+      font-weight: 800;
+    }
+
+    .ac-empty {
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 10.5px;
+      text-align: center;
+    }
+
+    .ac-filled-flash {
+      animation: ac-flash 700ms ease;
+    }
+
+    @keyframes ac-flash {
+      0% { background-color: #dff5ea; border-color: var(--brand); }
+      100% { background-color: #ffffff; border-color: var(--line); }
+    }
+
     /* Visually hidden native file input */
     .sr-only-input {
       position: absolute;
@@ -741,8 +842,28 @@
     </section>
 
     <form id="geoForm" novalidate>
-      <div class="group full"><label for="nama">Nama *</label><input type="text" id="nama" placeholder="Masukkan nama lengkap" autocomplete="name" required></div>
-      <div class="group"><label for="nip">NIP *</label><input type="text" id="nip" placeholder="Masukkan Nomor Induk Pegawai" inputmode="numeric" required></div>
+      <div class="group full">
+        <label for="nama">Nama *</label>
+        <div class="ac-wrap">
+          <input type="text" id="nama" placeholder="Cari / masukkan nama lengkap" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="acListNama" required>
+          <svg class="ac-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <ul id="acListNama" class="ac-list" role="listbox"></ul>
+        </div>
+      </div>
+      <div class="group">
+        <label for="nip">NIP *</label>
+        <div class="ac-wrap">
+          <input type="text" id="nip" placeholder="Cari / masukkan NIP" inputmode="numeric" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="acListNip" required>
+          <svg class="ac-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <ul id="acListNip" class="ac-list" role="listbox"></ul>
+        </div>
+      </div>
       <div class="group"><label for="timKerja">Tim Kerja / Direktorat *</label><input type="text" id="timKerja" placeholder="Contoh: Tim Kerja ... / Direktorat ..." required></div>
       <div class="group full"><label for="noTelp">No Telepon / WhatsApp *</label><input type="tel" id="noTelp" placeholder="Contoh: 081234567890" autocomplete="tel" required></div>
 
@@ -816,7 +937,9 @@
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyx-KOGfFB6Z91NZcHle0gITQxbPuq_btXeGD0mL82Xc_nNDrC2nn_js9hTCpOpZNh1_A/exec";
 
     const MAX_FILE_BYTES = 15 * 1024 * 1024;
+    const DIRECTORY_CACHE_KEY = "geoattend_hkn62_directory_v1";
     let attendanceConfig = null;
+    let participantDirectory = [];
     let map = null;
     let userMarker = null;
     let fenceCircle = null;
@@ -832,8 +955,11 @@
       const fileInput = document.getElementById("fotoKedatangan");
       fileInput.addEventListener("change", updateFilePreview);
 
+      initParticipantAutocomplete();
+
       try {
         await loadAttendanceConfig();
+        loadParticipantDirectory();
         initMap();
       } catch (error) {
         document.getElementById("versionDisplay").textContent = "GeoAttend-HKN62 • v2.0.0";
@@ -843,6 +969,232 @@
           "Tidak dapat membaca konfigurasi dari server: " + error.message);
       }
     });
+
+    /* =========================================================
+       Searchable Autocomplete Directory (Nama, NIP, No Telp)
+       ========================================================= */
+    function normalizePersonRecord(raw) {
+      if (!raw || typeof raw !== "object") return null;
+      const nama = String(raw.nama ?? raw.Nama ?? raw.name ?? raw.Name ?? raw.fullName ?? "").trim();
+      const nip = String(raw.nip ?? raw.NIP ?? raw.Nip ?? raw.nik ?? raw.NIK ?? "").replace(/^'+/, "").trim();
+      const timKerja = String(raw.timKerja ?? raw.TimKerja ?? raw["Tim Kerja"] ?? raw["Tim Kerja / Direktorat"] ?? raw.direktorat ?? raw.unit ?? "").trim();
+      const noTelp = String(raw.noTelp ?? raw.NoTelp ?? raw["No Telepon"] ?? raw["No Telepon / WhatsApp"] ?? raw.telp ?? raw.phone ?? raw.wa ?? "").replace(/^'+/, "").trim();
+      if (!nama && !nip) return null;
+      return { nama, nip, timKerja, noTelp };
+    }
+
+    function mergeParticipantDirectory(records) {
+      if (!Array.isArray(records)) return;
+      const mapByKey = new Map();
+
+      participantDirectory.forEach(item => {
+        const key = (item.nip || item.nama).toLowerCase();
+        if (key) mapByKey.set(key, item);
+      });
+
+      records.forEach(raw => {
+        const item = normalizePersonRecord(raw);
+        if (!item) return;
+        const key = (item.nip || item.nama).toLowerCase();
+        const existing = mapByKey.get(key) || {};
+        mapByKey.set(key, {
+          nama: item.nama || existing.nama || "",
+          nip: item.nip || existing.nip || "",
+          timKerja: item.timKerja || existing.timKerja || "",
+          noTelp: item.noTelp || existing.noTelp || ""
+        });
+      });
+
+      participantDirectory = Array.from(mapByKey.values());
+      try {
+        localStorage.setItem(DIRECTORY_CACHE_KEY, JSON.stringify(participantDirectory));
+      } catch (e) {
+        // Abaikan jika storage penuh/diblokir
+      }
+    }
+
+    function loadCachedDirectory() {
+      try {
+        const raw = localStorage.getItem(DIRECTORY_CACHE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          mergeParticipantDirectory(parsed);
+        }
+      } catch (e) {
+        // Abaikan cache korup
+      }
+    }
+
+    async function loadParticipantDirectory() {
+      loadCachedDirectory();
+      if (!GAS_WEB_APP_URL || !GAS_WEB_APP_URL.startsWith("https://")) return;
+
+      const actions = ["getParticipants", "getPegawai", "getRecords", "getAttendance"];
+      for (const action of actions) {
+        try {
+          const url = GAS_WEB_APP_URL + (GAS_WEB_APP_URL.includes("?") ? "&" : "?") + "action=" + action + "&_t=" + Date.now();
+          const res = await fetch(url, { method: "GET", redirect: "follow" });
+          if (!res.ok) continue;
+          const data = await res.json();
+          const list = Array.isArray(data)
+            ? data
+            : (data.participants || data.pegawai || data.records || data.data || data.rows || null);
+          if (Array.isArray(list) && list.length > 0) {
+            mergeParticipantDirectory(list);
+            break;
+          }
+        } catch (err) {
+          // Lanjut ke action fallback berikutnya
+        }
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function highlightMatch(text, query) {
+      const safeText = escapeHtml(text);
+      if (!query) return safeText;
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return safeText.replace(new RegExp("(" + escapedQuery + ")", "ig"), '<span class="ac-mark">$1</span>');
+    }
+
+    function applyAutocompleteSelection(person) {
+      const fields = [
+        { id: "nama", val: person.nama },
+        { id: "nip", val: person.nip },
+        { id: "timKerja", val: person.timKerja },
+        { id: "noTelp", val: person.noTelp }
+      ];
+
+      fields.forEach(f => {
+        if (!f.val) return;
+        const el = document.getElementById(f.id);
+        el.value = f.val;
+        el.classList.remove("ac-filled-flash");
+        void el.offsetWidth;
+        el.classList.add("ac-filled-flash");
+      });
+    }
+
+    function attachAutocomplete(inputId, listId, primaryField) {
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+      let activeIndex = -1;
+      let currentMatches = [];
+
+      const closeList = () => {
+        list.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+        activeIndex = -1;
+      };
+
+      const renderMatches = () => {
+        const rawQuery = input.value.trim();
+        if (rawQuery.length < 2 || participantDirectory.length === 0) {
+          closeList();
+          return;
+        }
+
+        const q = rawQuery.toLowerCase();
+        const qDigits = rawQuery.replace(/\s+/g, "");
+
+        currentMatches = participantDirectory
+          .filter(item => {
+            const namaMatch = item.nama.toLowerCase().includes(q);
+            const nipMatch = item.nip.toLowerCase().includes(qDigits);
+            const unitMatch = item.timKerja.toLowerCase().includes(q);
+            return namaMatch || nipMatch || unitMatch;
+          })
+          .sort((a, b) => {
+            const aPrimary = (primaryField === "nip" ? a.nip : a.nama).toLowerCase();
+            const bPrimary = (primaryField === "nip" ? b.nip : b.nama).toLowerCase();
+            const aStarts = aPrimary.startsWith(q) ? 0 : 1;
+            const bStarts = bPrimary.startsWith(q) ? 0 : 1;
+            if (aStarts !== bStarts) return aStarts - bStarts;
+            return a.nama.localeCompare(b.nama, "id");
+          })
+          .slice(0, 8);
+
+        if (currentMatches.length === 0) {
+          closeList();
+          return;
+        }
+
+        list.innerHTML = "";
+        activeIndex = -1;
+
+        currentMatches.forEach((person, idx) => {
+          const li = document.createElement("li");
+          li.className = "ac-item";
+          li.setAttribute("role", "option");
+          li.dataset.index = String(idx);
+
+          const metaParts = [];
+          if (person.nip) metaParts.push("NIP: " + highlightMatch(person.nip, rawQuery));
+          if (person.noTelp) metaParts.push("Telp: " + escapeHtml(person.noTelp));
+          if (person.timKerja) metaParts.push(highlightMatch(person.timKerja, rawQuery));
+
+          li.innerHTML =
+            '<div class="ac-name">' + highlightMatch(person.nama || "(Tanpa Nama)", rawQuery) + '</div>' +
+            (metaParts.length ? '<div class="ac-meta">' + metaParts.join(" • ") + '</div>' : "");
+
+          li.addEventListener("mousedown", function(e) {
+            e.preventDefault();
+            applyAutocompleteSelection(person);
+            closeList();
+          });
+
+          list.appendChild(li);
+        });
+
+        list.classList.add("is-open");
+        input.setAttribute("aria-expanded", "true");
+      };
+
+      const updateActiveItem = () => {
+        const items = list.querySelectorAll(".ac-item");
+        items.forEach((el, idx) => {
+          el.classList.toggle("is-active", idx === activeIndex);
+          if (idx === activeIndex) {
+            el.scrollIntoView({ block: "nearest" });
+          }
+        });
+      };
+
+      input.addEventListener("input", renderMatches);
+      input.addEventListener("focus", renderMatches);
+      input.addEventListener("blur", () => setTimeout(closeList, 140));
+
+      input.addEventListener("keydown", function(e) {
+        if (!list.classList.contains("is-open") || currentMatches.length === 0) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          activeIndex = (activeIndex + 1) % currentMatches.length;
+          updateActiveItem();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          activeIndex = (activeIndex - 1 + currentMatches.length) % currentMatches.length;
+          updateActiveItem();
+        } else if (e.key === "Enter" && activeIndex >= 0) {
+          e.preventDefault();
+          applyAutocompleteSelection(currentMatches[activeIndex]);
+          closeList();
+        } else if (e.key === "Escape") {
+          closeList();
+        }
+      });
+    }
+
+    function initParticipantAutocomplete() {
+      loadCachedDirectory();
+      attachAutocomplete("nama", "acListNama", "nama");
+      attachAutocomplete("nip", "acListNip", "nip");
+    }
 
     function updateFilePreview() {
       const fileInput = document.getElementById("fotoKedatangan");
@@ -925,6 +1277,10 @@
           "GeoAttend-HKN62 • " + String(payload.version || config.version);
       } else {
         document.getElementById("versionDisplay").textContent = "GeoAttend-HKN62 • v2.0.0";
+      }
+
+      if (Array.isArray(payload.participants || config.participants)) {
+        mergeParticipantDirectory(payload.participants || config.participants);
       }
 
       const rawAllowedRadius = Number(config.allowedRadius ?? config.AllowedRadius);
@@ -1193,6 +1549,7 @@
         releaseLock();
 
         if (result && result.success) {
+          mergeParticipantDirectory([{ nama, nip, timKerja, noTelp }]);
           showPopup(true, "Berhasil", result.message);
         } else {
           showPopup(false, "Gagal", result ? result.message : "Respons server tidak valid.");
